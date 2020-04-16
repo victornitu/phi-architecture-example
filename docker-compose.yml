@@ -1,0 +1,58 @@
+version: '3.1'
+services:
+  publisher:
+    build: ./publisher
+    restart: always
+    environment:
+      - EVENT_STORE=event-store:29092
+      - TOPIC=events
+    ports:
+      - '8081:80'
+    depends_on:
+      - event-store
+  handler:
+    build: ./handler
+    restart: always
+    environment:
+      - EVENT_STORE=event-store:29092
+      - TOPIC=events
+      - ENTITY_STORE=entity-store:27017
+      - DATABASE=entities
+    depends_on:
+      - event-store
+      - entity-store
+  inspector:
+    build: ./inspector
+    restart: always
+    environment:
+      - ENTITY_STORE=entity-store:27017
+      - DATABASE=entities
+    ports:
+      - '8082:80'
+    depends_on:
+      - entity-store
+  entity-store:
+    image: mongo:4.2.5
+    restart: always
+    volumes:
+      - './data/db:/data/db'
+    ports:
+      - '27017:27017'
+  event-store:
+    image: confluentinc/cp-kafka:5.4.1
+    restart: always
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://event-store:29092,PLAINTEXT_HOST://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+    ports:
+      - '9092:9092'
+    depends_on:
+      - zookeeper
+  zookeeper:
+    image: zookeeper:3.5
+    restart: always
