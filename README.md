@@ -46,4 +46,4 @@ The variable `SERVICE` must contain the name of service you wish to inspect.
 Here we inspect the service named `handler`.
 
 
-[1]: https://medium.com/phi-skills
+[1]: https://medium.com/phi-skills/event-driven-data-collection-d662a7db52a5
