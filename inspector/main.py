@@ -5,14 +5,15 @@ from sanic import Sanic
 from sanic.exceptions import NotFound, ServerError
 from sanic.request import Request
 from sanic.response import json, HTTPResponse
+from sanic_cors import CORS
 
 ENTITY_STORE = os.environ.get('ENTITY_STORE', 'localhost:27017')
 DATABASE = os.environ.get('DATABASE', 'entities')
 
 app = Sanic(name='Inspector')
+CORS(app)
 
-
-@app.route('/v1.0/product')
+@app.route('/v1.0/product', methods=['GET', 'OPTIONS'])
 async def inspect_products(request: Request) -> HTTPResponse:
     collection = connect_collection('products')
     products = []
@@ -22,7 +23,7 @@ async def inspect_products(request: Request) -> HTTPResponse:
     return json({'products': products})
 
 
-@app.route('/v1.0/customer')
+@app.route('/v1.0/customer', methods=['GET', 'OPTIONS'])
 async def inspect_customers(request: Request) -> HTTPResponse:
     collection = connect_collection('customers')
     customers = []

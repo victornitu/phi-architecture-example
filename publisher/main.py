@@ -5,12 +5,18 @@ from sanic import Sanic
 from sanic.exceptions import NotFound, ServerError
 from sanic.request import Request
 from sanic.response import json, HTTPResponse
+from sanic_cors import CORS
 
 EVENT_STORE = os.environ.get('EVENT_STORE', 'localhost:9092')
 TOPIC = os.environ.get('TOPIC', 'events')
 ENCODING = os.environ.get('ENCODING', 'utf-8')
 
 app = Sanic(name='Publisher')
+CORS(app)
+
+@app.route('/v1.0/product/<product_name:[A-z0-9]+>/watched', methods=['OPTIONS'])
+async def visitor_watched_product(request: Request, product_name: str) -> HTTPResponse:
+    return json({})
 
 
 @app.route('/v1.0/product/<product_name:[A-z0-9]+>/watched', methods=['POST'])
@@ -26,6 +32,11 @@ async def visitor_watched_product(request: Request, product_name: str) -> HTTPRe
     }
     producer.send(TOPIC, event)
     return json({'event': event})
+
+
+@app.route('/v1.0/customer/<customer_name:[A-z]+>/bought', methods=['OPTIONS'])
+async def customer_bought_products(request: Request, customer_name: str) -> HTTPResponse:
+    return json({})
 
 
 @app.route('/v1.0/customer/<customer_name:[A-z]+>/bought', methods=['POST'])
