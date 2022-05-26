@@ -16,6 +16,6 @@ sanic==19.12.2
 Sanic-Cors==0.10.0.post3
 Sanic-Plugins-Framework==0.9.2
 sniffio==1.1.0
-ujson==2.0.3
+ujson==5.2.0
 uvloop==0.14.0
 websockets==8.1
